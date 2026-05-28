@@ -132,31 +132,35 @@ def generate_summary(title: str, rank: int) -> str:
 
 def format_hot_topics(topics: List[Dict]) -> str:
     """
-    格式化热搜榜为可读文本
+    格式化热搜榜为表格形式
     
     Args:
         topics: 热搜列表
     
     Returns:
-        格式化后的字符串
+        格式化后的表格字符串
     """
     if not topics:
         return "暂无热搜数据"
     
-    result = "【微博热搜榜前十】\n\n"
+    # 计算最长标题长度
+    max_title_length = max(len(topic['title']) for topic in topics)
+    max_title_length = min(max_title_length, 30)
+    
+    # 表格头部
+    result = "┌──────┬────────────────────────────────────────┐\n"
+    result += "│ 排名 │ 热搜标题                              │\n"
+    result += "├──────┼────────────────────────────────────────┤\n"
+    
+    # 表格内容
     for topic in topics:
-        result += f"{topic['rank']}. {topic['title']}\n"
-        # 格式化热度显示
-        hot = topic['hot']
-        if hot and hot.isdigit():
-            hot_num = int(hot)
-            if hot_num >= 10000:
-                hot = f"{hot_num/10000:.1f}万"
-        result += f"   🔥 热度: {hot}\n"
-        result += f"   💬 {topic['summary']}\n"
-        if topic['url']:
-            result += f"   🔗 {topic['url']}\n"
-        result += "\n"
+        rank = str(topic['rank']).center(4)
+        title = topic['title'][:max_title_length]
+        title = title.ljust(36)
+        result += f"│ {rank} │ {title} │\n"
+    
+    # 表格底部
+    result += "└──────┴────────────────────────────────────────┘\n"
     
     return result
 
